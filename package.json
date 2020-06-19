@@ -15,7 +15,7 @@
     "@nuxt/typescript-runtime": "^0.4.0",
     "@nuxtjs/axios": "^5.3.6",
     "@nuxtjs/pwa": "^3.0.0-0",
-    "@vue/eslint-config-airbnb": "^5.0.2",
+    "eslint-config-airbnb": "^18.2.0",
     "nuxt": "^2.0.0",
     "nuxt-sweetalert2": "^1.0.0",
     "vue-class-component": "^7.2.3",
@@ -26,9 +26,7 @@
     "@nuxt/typescript-build": "^0.6.0",
     "@nuxtjs/eslint-config-typescript": "^1.0.0",
     "@nuxtjs/eslint-module": "^1.0.0",
-    "babel-eslint": "^10.0.1",
     "eslint": "^7.2.0",
-    "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.21.2",
     "eslint-plugin-nuxt": ">=0.4.2"
   }
