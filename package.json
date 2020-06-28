@@ -1,33 +1,60 @@
 {
-  "name": "blind-test",
-  "version": "1.0.0",
-  "description": "Blind Test Front",
-  "author": "Kevan Sadeghi",
+  "name": "blindtest-front",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "nuxt-ts",
-    "build": "nuxt-ts build",
-    "generate": "nuxt-ts generate",
-    "start": "nuxt-ts start",
-    "lint": "eslint --ext .js,.vue --ignore-path .gitignore ."
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@nuxt/typescript-runtime": "^0.4.0",
-    "@nuxtjs/axios": "^5.3.6",
-    "@nuxtjs/pwa": "^3.0.0-0",
-    "eslint-config-airbnb": "^18.2.0",
-    "nuxt": "^2.0.0",
-    "nuxt-sweetalert2": "^1.0.0",
-    "vue-class-component": "^7.2.3",
+    "@fortawesome/fontawesome-free": "^5.13.1",
+    "axios": "^0.19.2",
+    "bootstrap": "^4.5.0",
+    "core-js": "^3.6.5",
+    "sweetalert2": "^9.15.2",
+    "vue": "^2.6.11",
+    "vue-axios": "^2.1.5",
     "vue-moment": "^4.1.0",
-    "vue-router": "^3.3.4"
+    "vue-router": "^3.3.4",
+    "vue-sweetalert2": "^3.0.5"
   },
   "devDependencies": {
-    "@nuxt/typescript-build": "^0.6.0",
-    "@nuxtjs/eslint-config-typescript": "^1.0.0",
-    "@nuxtjs/eslint-module": "^1.0.0",
-    "eslint": "^7.2.0",
-    "eslint-plugin-import": "^2.21.2",
-    "eslint-plugin-nuxt": ">=0.4.2"
-  }
+    "@vue/cli-plugin-babel": "~4.3.0",
+    "@vue/cli-plugin-eslint": "~4.3.0",
+    "@vue/cli-service": "~4.3.0",
+    "@vue/eslint-config-airbnb": "^5.0.2",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.7.2",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-vue": "^6.2.2",
+    "vue-template-compiler": "^2.6.11"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "@vue/airbnb"
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "rules": {
+      "indent": [
+        "error",
+        "tab"
+      ],
+      "no-tabs": "off",
+      "no-console": "off",
+      "no-mixed-spaces-and-tabs": "off"
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
 }
