@@ -8,10 +8,10 @@
 				<div class="card-text">
 					<form @submit.prevent="onSubmit">
 						<div class="form-group">
-							<input v-model='email'
-										 type="email"
+							<input v-model='username'
+										 type="text"
 										 class="form-control"
-										 placeholder="Enter your email"
+										 placeholder="Enter your username"
 										 required>
 						</div>
 						<div class="form-group">
@@ -43,21 +43,24 @@ import eventBus from '../../utils/eventBus';
 export default {
 	name: 'Login',
 	data: () => ({
-		email: null,
+		username: null,
 		password: null,
 		error: false,
 	}),
 	methods: {
 		async onSubmit() {
+			// eslint-disable-next-line no-unused-vars
 			const [err, response] = await to(this.axios.post(`${this.$serverApiLink}/login_check`, {
-				username: this.email,
+				username: this.username,
 				password: this.password,
 			}));
 
 			if (err) {
 				return notify('Error !', 'Bad credentials', 'error');
 			}
+
 			localStorage.setItem('token', response.data.token);
+			localStorage.setItem('user', 'true');
 
 			eventBus.$emit('login');
 
