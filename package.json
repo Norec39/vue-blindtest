@@ -12,13 +12,14 @@
     "axios": "^0.19.2",
     "bootstrap": "^4.5.0",
     "core-js": "^3.6.5",
+    "jquery": "^3.5.1",
+    "popper.js": "^1.16.1",
     "sweetalert2": "^9.15.2",
     "vue": "^2.6.11",
     "vue-axios": "^2.1.5",
     "vue-moment": "^4.1.0",
     "vue-router": "^3.3.4",
-    "vue-sweetalert2": "^3.0.5",
-    "yarn": "^1.22.4"
+    "vue-sweetalert2": "^3.0.5"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.3.0",
@@ -53,7 +54,9 @@
       "no-mixed-spaces-and-tabs": "off",
       "max-len": [
         "error",
-        { "code":  120 }
+        {
+          "code": 120
+        }
       ]
     }
   },

@@ -32,8 +32,25 @@
 				</li>
 			</ul>
 			<ul class="navbar-nav ml-auto" v-else>
-				<li class="nav-item">
-					<a class="nav-link" href="" @click="logout()" >Logout</a>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle"
+					   id="navbarDropdown"
+					   role="button"
+					   data-toggle="dropdown">
+						Bonjour {{ this.username }}
+					</a>
+					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+						<router-link class="dropdown-item"
+									 :to="{ name: 'profile' }">
+							<i class="fa fa-user"></i> Profile
+						</router-link>
+						<a class="dropdown-item"
+						   href=""
+						   :to="{ name: 'login' }"
+						   @click="logout()">
+							<i class="fa fa-door-closed"></i> Logout
+						</a>
+					</div>
 				</li>
 			</ul>
 		</nav>
@@ -42,20 +59,25 @@
 
 <script>
 import eventBus from '../utils/eventBus';
+import profile from '../utils/profile';
 
 export default {
 	name: 'Navbar',
 	data: () => ({
 		user: false,
+		username: null,
 	}),
 	mounted() {
 		this.user = localStorage.getItem('user');
+		this.username = profile.username;
+
 		eventBus.$on('login', () => {
 			this.user = true;
 		});
 		eventBus.$on('logout', () => {
 			localStorage.removeItem('token');
 			localStorage.removeItem('user');
+			localStorage.removeItem('user_profile');
 		});
 	},
 	methods: {

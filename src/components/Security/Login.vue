@@ -60,9 +60,9 @@ export default {
 			if (err) {
 				return notify('Error !', 'Bad credentials', 'error');
 			}
-
 			localStorage.setItem('token', response.data.token);
 			localStorage.setItem('user', 'true');
+			localStorage.setItem('user_profile', JSON.stringify(response.data.data));
 
 			eventBus.$emit('login');
 

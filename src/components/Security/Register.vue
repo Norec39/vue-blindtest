@@ -49,12 +49,13 @@
 							</div>
 						</div>
 						<div class="d-flex mt-4">
-							<button type="submit" class="ml-auto btn"
-									:class="passwordCheck && password.length > 8
-									? 'btn-success'
-									: 'btn-light'"
+							<button v-if="!passwordCheck || password.length < 8"
+									type="submit" class="ml-auto btn btn-light"
 									:disabled="!passwordCheck || password.length < 8">
-								Register
+								Submit
+							</button>
+							<button type="submit" class="ml-auto btn btn-success" v-else>
+								Submit
 							</button>
 						</div>
 					</form>
