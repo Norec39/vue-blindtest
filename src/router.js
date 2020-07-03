@@ -4,6 +4,7 @@ import VueRouter from 'vue-router';
 import Home from './components/Home.vue';
 import Login from './components/Security/Login.vue';
 import Register from './components/Security/Register.vue';
+import Upload from './components/Upload/Upload.vue';
 import Profile from './components/Profile/Profile.vue';
 import RoomList from './components/Room/RoomList.vue';
 import RoomCreate from './components/Room/RoomCreate.vue';
@@ -27,6 +28,11 @@ const routes = [
 		path: '/register',
 		name: 'register',
 		component: Register,
+	},
+	{
+		path: '/upload',
+		name: 'upload',
+		component: Upload,
 	},
 	{
 		path: '/profile',

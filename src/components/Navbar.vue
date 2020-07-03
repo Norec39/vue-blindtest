@@ -21,6 +21,12 @@
 							Room
 						</router-link>
 					</li>
+					<li class="nav-item">
+						<router-link class="nav-link"
+												 :to="{ name: 'upload' }">
+							Upload
+						</router-link>
+					</li>
 					<li class="nav-item" v-if="checkAdmin">
 						<router-link class="nav-link"
 												 :to="{ name: 'categoriesList' }">
