@@ -15,6 +15,12 @@
 					<li class="nav-item">
 						<router-link class="nav-link" :to="{ name: 'home'}">Home</router-link>
 					</li>
+					<li class="nav-item">
+						<router-link class="nav-link"
+						             :to="{ name: 'upload' }">
+							Upload
+						</router-link>
+					</li>
 				</ul>
 			</div>
 			<ul class="navbar-nav ml-auto" v-if="!this.user">
