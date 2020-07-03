@@ -15,6 +15,13 @@
 										 required>
 						</div>
 						<div class="form-group">
+							<input v-model='email'
+										 type="email"
+										 class="form-control"
+										 placeholder="Enter your email"
+										 required>
+						</div>
+						<div class="form-group">
 							<input v-model='password'
 										 type="password"
 										 class="form-control"
@@ -22,11 +29,7 @@
 										 required>
 						</div>
 						<div class="d-flex mt-4">
-							<router-link class="btn btn-light"
-													 :to="{ name: 'register'}"
-													 type="submit">Register
-							</router-link>
-							<button type="submit" class="ml-auto btn btn-primary">Login</button>
+							<button type="submit" class="ml-auto btn btn-primary">Register</button>
 						</div>
 					</form>
 				</div>
@@ -38,33 +41,31 @@
 <script>
 import to from '../../utils/to';
 import notify from '../../utils/notify';
-import eventBus from '../../utils/eventBus';
 
 export default {
 	name: 'Register',
 	data: () => ({
 		username: null,
 		password: null,
+		email: null,
 		error: false,
 	}),
 	methods: {
 		async onSubmit() {
 			// eslint-disable-next-line no-unused-vars
-			const [err, response] = await to(this.axios.post(`${this.$serverApiLink}/login_check`, {
+			const [err, response] = await to(this.axios.post(`${this.$serverApiLink}/register`, {
 				username: this.username,
 				password: this.password,
+				email: this.email,
 			}));
 
 			if (err) {
-				return notify('Error !', 'Bad credentials', 'error');
+				return notify('Error !', 'User already exist', 'error');
 			}
 
-			localStorage.setItem('token', response.data.token);
-			localStorage.setItem('user', 'true');
+			notify('Success !', 'User created', 'success');
 
-			eventBus.$emit('login');
-
-			return this.$router.push('/');
+			return this.$router.push('/login');
 		},
 	},
 };

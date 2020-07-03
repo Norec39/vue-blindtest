@@ -8,6 +8,6 @@ export default function notify(title, text, icon) {
 		position: 'top-end',
 		icon,
 		timerProgressBar: true,
-		timer: 2000,
+		timer: 3000,
 	});
 }
