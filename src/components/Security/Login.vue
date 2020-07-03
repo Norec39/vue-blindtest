@@ -9,24 +9,26 @@
 					<form @submit.prevent="onSubmit">
 						<div class="form-group">
 							<input v-model='username'
-										 type="text"
-										 class="form-control"
-										 placeholder="Enter your username"
-										 required>
+								   type="text"
+								   class="form-control"
+								   placeholder="Enter your username"
+								   required>
 						</div>
 						<div class="form-group">
 							<input v-model='password'
-										 type="password"
-										 class="form-control"
-										 placeholder="Enter your password"
-										 required>
+								   type="password"
+								   class="form-control"
+								   placeholder="Enter your password"
+								   required>
 						</div>
 						<div class="d-flex mt-4">
 							<router-link class="btn btn-light"
-													 :to="{ name: 'Register'}"
-													 type="submit">Register
+										 :to="{ name: 'register'}"
+										 type="submit">Register
 							</router-link>
-							<button type="submit" class="ml-auto btn btn-primary">Login</button>
+							<button type="submit" class="ml-auto btn btn-primary">
+								Login
+							</button>
 						</div>
 					</form>
 				</div>
