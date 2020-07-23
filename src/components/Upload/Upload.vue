@@ -16,34 +16,49 @@
 					</div>
 
 					<div class="form-group">
-						<label for="title">Title</label>
+						<label for="category">Category</label>
+						<select class="form-control"
+						        id="category"
+						        v-model="category"
+						        name="category"
+						        @change="onCategoryChange($event)"
+						>
+							<option v-for="option in categories"
+							        v-bind:value="option.id"
+							        v-bind:key="option.id"
+							>
+								{{ option.name }}
+							</option>
+						</select>
+					</div>
+
+					<div class="form-group">
+<!--						<label for="exampleFormControlSelect1">Example select</label>-->
+<!--						<select class="form-control" id="exampleFormControlSelect1" :disabled="category == null">-->
+<!--							<option>1</option>-->
+<!--							<option>2</option>-->
+<!--							<option>3</option>-->
+<!--							<option>4</option>-->
+<!--							<option>5</option>-->
+<!--						</select>-->
+
+						<label for="source">Origin</label>
+						<input
+								id="source"
+								v-model="source"
+								type="text"
+								name="title"
+								class="form-control"
+						>
+					</div>
+
+					<div class="form-group">
+						<label for="title">New Origin?</label>
 						<input
 							id="title"
 							v-model="title"
 							type="text"
 							name="title"
-							class="form-control"
-						>
-					</div>
-
-					<div class="form-group">
-						<label for="category">Category</label>
-						<input
-							id="category"
-							v-model="category"
-							type="text"
-							name="category"
-							class="form-control"
-						>
-					</div>
-
-					<div class="form-group">
-						<label for="support">Support</label>
-						<input
-							id="support"
-							v-model="support"
-							type="text"
-							name="support"
 							class="form-control"
 						>
 					</div>
@@ -76,26 +91,39 @@ export default {
 	data: () => ({
 		errors: [],
 		title: null,
-		support: null,
+		categories: [],
 		category: null,
+		sources: [],
+		source: null,
 		file: null,
 	}),
+	beforeMount() {
+		this.getCategories();
+	},
 	methods: {
+		async getCategories() {
+			const [err, response] = await to(this.axios.get(`${this.$serverApiLink}/categories`));
+			if (err) {
+				console.error(err);
+			}
+			this.categories = response.data;
+		},
 		async checkForm() {
 			const formData = new FormData();
 			formData.append('file', this.file);
 			// eslint-disable-next-line no-unused-vars
-			const [err, response] = await to(this.axios.post(`${this.$serverApiLink}/media_objects`, {
-				file: formData,
-			}, {
+			const [err, response] = await to(this.axios.post(`${this.$serverApiLink}/media_objects`, formData, {
 				headers: {
 					'Content-Type': 'multipart/form-data',
 				},
 			}));
 
 			if (err) {
-				console.log(err);
+				console.error(err);
 			}
+		},
+		onCategoryChange(event) {
+			this.sources = this.categories.find((category) => category.id === event.target.value).sources;
 		},
 		handleFileUpload() {
 			// eslint-disable-next-line prefer-destructuring
