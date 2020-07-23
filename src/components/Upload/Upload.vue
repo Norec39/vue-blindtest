@@ -15,68 +15,84 @@
 						</ul>
 					</div>
 
+					<div v-if="!categories">
+						Loading...
+					</div>
 					<div class="form-group">
 						<label for="category">Category</label>
 						<select class="form-control"
 						        id="category"
 						        v-model="category"
 						        name="category"
-						        @change="onCategoryChange($event)"
+						        @change="onCategoryChange()"
+						        :disabled="!categories"
 						>
-							<option v-for="option in categories"
-							        v-bind:value="option.id"
-							        v-bind:key="option.id"
+							<option v-for="category in categories"
+							        v-bind:value="category"
+							        v-bind:key="category.id"
 							>
-								{{ option.name }}
+								{{ category.name }}
 							</option>
 						</select>
 					</div>
 
-					<div class="form-group">
-<!--						<label for="exampleFormControlSelect1">Example select</label>-->
-<!--						<select class="form-control" id="exampleFormControlSelect1" :disabled="category == null">-->
-<!--							<option>1</option>-->
-<!--							<option>2</option>-->
-<!--							<option>3</option>-->
-<!--							<option>4</option>-->
-<!--							<option>5</option>-->
-<!--						</select>-->
+					<div v-if="category !== null">
+						<div class="form-group" v-if="sources.length !== 0">
+							<label for="source">{{ getSourceType() }}</label>
+							<select class="form-control"
+							        id="source"
+							        v-model="source"
+							        type="text"
+							        name="title"
+							        :disabled="category == null">
+								<option v-for="option in sources"
+								        v-bind:value="option"
+								        v-bind:key="option.id"
+								>
+									{{ option.name }}
+								</option>
+							</select>
+						</div>
 
-						<label for="source">Origin</label>
-						<input
-								id="source"
-								v-model="source"
+						<div class="form-group"
+						     v-if="!source"
+						>
+							<label for="newSource">New {{ getSourceType() }}?</label>
+							<input
+								id="newSource"
+								v-model="newSource"
+								type="text"
+								name="newSource"
+								class="form-control"
+							>
+						</div>
+
+						<div class="form-group">
+							<label for="title">Track Title</label>
+							<input
+								id="title"
+								v-model="title"
 								type="text"
 								name="title"
 								class="form-control"
-						>
-					</div>
+							>
+						</div>
 
-					<div class="form-group">
-						<label for="title">New Origin?</label>
-						<input
-							id="title"
-							v-model="title"
-							type="text"
-							name="title"
-							class="form-control"
-						>
-					</div>
+						<div class="form-group">
+							<label>File
+							<input type="file"
+							       id="file"
+							       class="form-control-file"
+							       accept=".mp3,audio/*"
+							       ref="file"
+							       v-on:change="handleFileUpload()"
+							/>
+							</label>
+						</div>
 
-					<div class="form-group">
-						<label>File
-						<input type="file"
-						       id="file"
-						       class="form-control-file"
-						       accept=".mp3,audio/*"
-						       ref="file"
-						       v-on:change="handleFileUpload()"
-						/>
-						</label>
-					</div>
+						<button type="submit" class="btn btn-primary">Submit</button>
 
-					<p>{{ this.file }}</p>
-					<button type="submit" class="btn btn-primary">Submit</button>
+					</div>
 				</form>
 			</div>
 		</div>
@@ -90,11 +106,12 @@ export default {
 	name: 'Upload',
 	data: () => ({
 		errors: [],
-		title: null,
-		categories: [],
+		categories: null,
 		category: null,
 		sources: [],
 		source: null,
+		newSource: null,
+		title: null,
 		file: null,
 	}),
 	beforeMount() {
@@ -106,24 +123,72 @@ export default {
 			if (err) {
 				console.error(err);
 			}
-			this.categories = response.data;
+			this.categories = response.data['hydra:member'];
 		},
 		async checkForm() {
 			const formData = new FormData();
 			formData.append('file', this.file);
 			// eslint-disable-next-line no-unused-vars
-			const [err, response] = await to(this.axios.post(`${this.$serverApiLink}/media_objects`, formData, {
+			let [err, response] = await to(this.axios.post(`${this.$serverApiLink}/media_objects`, formData, {
 				headers: {
 					'Content-Type': 'multipart/form-data',
 				},
 			}));
 
 			if (err) {
+				console.log('Error file upload');
 				console.error(err);
+				return false;
 			}
+			const mediaSrc = response.data.contentUrl;
+
+			// Create new Source
+			if (this.source == null) {
+				[err, response] = await to(this.axios.post(`${this.$serverApiLink}/sources`, {
+					name: this.newSource,
+					Category: this.category,
+				}));
+
+				if (err) {
+					console.error(err);
+					return false;
+				}
+				this.source = response.data;
+			}
+
+			// eslint-disable-next-line no-unused-vars
+			[err, response] = await to(this.axios.post(`${this.$serverApiLink}/songs`, {
+				title: this.title,
+				source: this.source,
+				src: mediaSrc,
+			}));
+
+			if (err) {
+				console.error(err);
+				return false;
+			}
+			console.log('Envoi reussi');
+			return true;
 		},
-		onCategoryChange(event) {
-			this.sources = this.categories.find((category) => category.id === event.target.value).sources;
+		onCategoryChange() {
+			this.sources = this.category.sources;
+		},
+		getSourceType() {
+			let string = '';
+			switch (this.category.id) {
+			case 1:
+				string = 'Game';
+				break;
+			case 2:
+				string = 'Anime';
+				break;
+			case 3:
+				string = 'Serie';
+				break;
+			default:
+				string = '';
+			}
+			return string;
 		},
 		handleFileUpload() {
 			// eslint-disable-next-line prefer-destructuring
