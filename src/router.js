@@ -4,6 +4,7 @@ import VueRouter from 'vue-router';
 import Home from './components/Home.vue';
 import Login from './components/Security/Login.vue';
 import Register from './components/Security/Register.vue';
+import Categories from './components/Categories.vue';
 
 Vue.use(VueRouter);
 
@@ -22,6 +23,11 @@ const routes = [
 		path: '/register',
 		name: 'register',
 		component: Register,
+	},
+	{
+		path: '/categories',
+		name: 'categories',
+		component: Categories,
 	},
 ];
 

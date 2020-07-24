@@ -1,14 +1,18 @@
 <template>
 	<div>
-		<h1>Homepage</h1>
+		<categories />
 	</div>
 </template>
 
 <script>
 import eventBus from '../utils/eventBus';
+import Categories from './Categories.vue';
 
 export default {
 	name: 'Home',
+	components: {
+		Categories,
+	},
 	data: () => ({}),
 	mounted() {
 		this.user = localStorage.getItem('user');
@@ -21,6 +25,9 @@ export default {
 		logout() {
 			eventBus.$emit('logout');
 		},
+	},
+	comments: {
+		Categories,
 	},
 };
 </script>
