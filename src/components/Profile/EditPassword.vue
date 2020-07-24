@@ -81,7 +81,6 @@ export default {
 					old_password: this.oldPassword,
 				},
 			));
-			console.log(err);
 
 			if (err) {
 				return notify('Error !', err.response.data.message, 'error');
@@ -98,8 +97,6 @@ export default {
 				username: this.email,
 				password: this.password,
 			}));
-
-			console.log(response);
 
 			localStorage.setItem('token', response.data.token);
 			localStorage.setItem('user_profile', JSON.stringify(response.data.data));

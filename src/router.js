@@ -5,6 +5,9 @@ import Home from './components/Home.vue';
 import Login from './components/Security/Login.vue';
 import Register from './components/Security/Register.vue';
 import Profile from './components/Profile/Profile.vue';
+import RoomList from './components/Room/RoomList.vue';
+import RoomCreate from './components/Room/RoomCreate.vue';
+import RoomView from './components/Room/RoomView.vue';
 
 Vue.use(VueRouter);
 
@@ -28,6 +31,21 @@ const routes = [
 		path: '/profile',
 		name: 'profile',
 		component: Profile,
+	},
+	{
+		path: '/room-list',
+		name: 'roomList',
+		component: RoomList,
+	},
+	{
+		path: '/room-create',
+		name: 'roomCreate',
+		component: RoomCreate,
+	},
+	{
+		path: '/room/:id',
+		name: 'roomView',
+		component: RoomView,
 	},
 ];
 

@@ -29,6 +29,8 @@ axios.interceptors.request.use(
 			// eslint-disable-next-line no-param-reassign
 			config.headers.Authorization = `Bearer ${token}`;
 		}
+		// eslint-disable-next-line no-param-reassign
+		config.headers.Accept = 'application/json';
 		return config;
 	},
 	(error) => {
