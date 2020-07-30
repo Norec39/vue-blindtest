@@ -26,7 +26,7 @@ Vue.config.productionTip = false;
 axios.interceptors.response.use(
 	(response) => response, (error) => {
 		// eslint-disable-next-line eqeqeq
-		if (error.response.data.message === 'Expired JWT Token') {
+		if (error.response.data.message === 'Invalid JWT Token') {
 			Promise.reject(error);
 			eventBus.$emit('logout');
 			return router.push('/login');

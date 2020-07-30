@@ -1,14 +1,36 @@
 <template>
 	<div class="container mt-3">
-		<button @click="fetchRooms">
+		<button class="btn btn-light" @click="fetchRooms">
 			<i class="fas fa-sync-alt"></i>
 		</button>
-		<ul v-if="rooms.length">
-			<li v-for="r in rooms" :key="r['@id']">
-				{{ r.name }}
-				{{ r.id }}
-			</li>
-		</ul>
+		<div v-if="rooms.length" class="d-flex flex-row justify-content-around flex-wrap">
+			<div v-for="r in rooms" :key="r['@id']">
+				<div v-if="r.active" class="card mb-2">
+					<div class="card-header">
+						<div class="card-title">{{ r.name }}</div>
+					</div>
+					<div class="card-body">
+						Size Limit : {{ r.sizeLimit }} <br>
+						Score Limit : {{ r.scoreLimit }} <br>
+						Answer Number : {{ r.answerNb }}
+					</div>
+					<div class="card-footer">
+						<div v-if="r.password">
+							<button class="btn btn-success" disabled>
+								Entrer dans la room
+							</button>
+						</div>
+						<router-link v-else
+												 class="btn btn-success"
+												 :to="{ name: 'roomView', params: { id: r.id } }">
+							Entrer dans la room
+						</router-link>
+					</div>
+				</div>
+				<div v-else>
+				</div>
+			</div>
+		</div>
 		<p v-else>No rooms yet !</p>
 	</div>
 </template>
@@ -29,7 +51,7 @@ export default {
 		async fetchRooms() {
 			console.log('fetch');
 			const [err, response] = await to(this.axios.get(
-				`${this.$serverApiLink}/rooms/`,
+				`${this.$serverApiLink}/games/`,
 			));
 
 			if (err) {
@@ -41,7 +63,3 @@ export default {
 	},
 };
 </script>
-
-<style scoped>
-
-</style>

@@ -21,6 +21,12 @@
 							Room
 						</router-link>
 					</li>
+					<li class="nav-item" v-if="checkAdmin">
+						<router-link class="nav-link"
+												 :to="{ name: 'categoriesList' }">
+							Categories
+						</router-link>
+					</li>
 				</ul>
 			</div>
 			<ul class="navbar-nav ml-auto" v-if="!this.user">
@@ -91,6 +97,12 @@ export default {
 	methods: {
 		logout() {
 			eventBus.$emit('logout');
+		},
+	},
+	computed: {
+		checkAdmin() {
+			return (JSON.parse(localStorage.getItem('user_profile'))
+				.role).includes('ROLE_ADMIN');
 		},
 	},
 };

@@ -1,14 +1,25 @@
 <template>
 	<div class="container mt-3">
-		<button @click="fetchRooms">
+		<button class="btn btn-light" @click="fetchRooms">
 			<i class="fas fa-sync-alt"></i>
 		</button>
-		<ul v-if="rooms.length">
-			<li v-for="r in rooms" :key="r['@id']">
-				{{ r.name }}
-				{{ r.id }}
-			</li>
-		</ul>
+		<div v-if="rooms.length" class="d-flex flex-row justify-content-between flex-wrap">
+			<div v-for="r in rooms" :key="r['@id']">
+				<div class="card">
+					<div class="card-header">
+						<div class="card-title">{{ r.name }}</div>
+					</div>
+					<div class="card-body">
+						Size Limit : {{ r.sizeLimit }}
+						Score Limit : {{ r.scoreLimit }}
+						Answer Number : {{ r.answerNb }}
+					</div>
+					<div class="card-footer">
+						Propriétaire de la room : {{ r.owner }}
+					</div>
+				</div>
+			</div>
+		</div>
 		<p v-else>No rooms yet !</p>
 	</div>
 </template>
@@ -41,7 +52,3 @@ export default {
 	},
 };
 </script>
-
-<style scoped>
-
-</style>

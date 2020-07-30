@@ -8,6 +8,7 @@ import Profile from './components/Profile/Profile.vue';
 import RoomList from './components/Room/RoomList.vue';
 import RoomCreate from './components/Room/RoomCreate.vue';
 import RoomView from './components/Room/RoomView.vue';
+import CategoriesList from './components/Categories/CategoriesList.vue';
 
 Vue.use(VueRouter);
 
@@ -46,6 +47,11 @@ const routes = [
 		path: '/room/:id',
 		name: 'roomView',
 		component: RoomView,
+	},
+	{
+		path: '/categories',
+		name: 'categoriesList',
+		component: CategoriesList,
 	},
 ];
 
