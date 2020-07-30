@@ -3,11 +3,11 @@
 		<nav class="navbar navbar-expand-lg navbar-light bg-light">
 			<a class="navbar-brand" href="/">Navbar</a>
 			<button class="navbar-toggler" type="button"
-					data-toggle="collapse"
-					data-target="#navbarSupportedContent"
-					aria-controls="navbarSupportedContent"
-					aria-expanded="false"
-					aria-label="Toggle navigation">
+							data-toggle="collapse"
+							data-target="#navbarSupportedContent"
+							aria-controls="navbarSupportedContent"
+							aria-expanded="false"
+							aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"></span>
 			</button>
 			<div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -15,36 +15,38 @@
 					<li class="nav-item">
 						<router-link class="nav-link" :to="{ name: 'home'}">Home</router-link>
 					</li>
-					<li class="nav-item">
+					<li class="nav-item" v-if="user">
 						<router-link class="nav-link"
 												 :to="{ name: 'roomList' }">
 							Room
 						</router-link>
 					</li>
-					<li class="nav-item">
+					<li class="nav-item" v-if="user">
 						<router-link class="nav-link"
 												 :to="{ name: 'upload' }">
 							Upload
 						</router-link>
 					</li>
-					<li class="nav-item" v-if="checkAdmin">
-						<router-link class="nav-link"
-												 :to="{ name: 'categoriesList' }">
-							Categories
-						</router-link>
-					</li>
+					<div v-if="user">
+						<li class="nav-item" v-if="checkAdmin">
+							<router-link class="nav-link"
+													 :to="{ name: 'categoriesList' }">
+								Categories
+							</router-link>
+						</li>
+					</div>
 				</ul>
 			</div>
-			<ul class="navbar-nav ml-auto" v-if="!this.user">
+			<ul class="navbar-nav ml-auto" v-if="!user">
 				<li class="nav-item">
 					<router-link class="nav-link"
-								 :to="{ name: 'register'}">
+											 :to="{ name: 'register'}">
 						Register
 					</router-link>
 				</li>
 				<li class="nav-item">
 					<router-link class="nav-link"
-								 :to="{ name: 'login' }">
+											 :to="{ name: 'login' }">
 						Login
 					</router-link>
 				</li>
@@ -52,20 +54,20 @@
 			<ul class="navbar-nav ml-auto" v-else>
 				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle"
-					   id="navbarDropdown"
-					   role="button"
-					   data-toggle="dropdown">
-						Bonjour {{ this.username }}
+						 id="navbarDropdown"
+						 role="button"
+						 data-toggle="dropdown">
+						Bonjour {{ username }}
 					</a>
 					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
 						<router-link class="dropdown-item"
-									 :to="{ name: 'profile' }">
+												 :to="{ name: 'profile' }">
 							<i class="fa fa-user"></i> Profile
 						</router-link>
 						<a class="dropdown-item"
-						   href=""
-						   :to="{ name: 'login' }"
-						   @click="logout()">
+							 href=""
+							 :to="{ name: 'login' }"
+							 @click="logout()">
 							<i class="fa fa-door-closed"></i> Logout
 						</a>
 					</div>
@@ -92,6 +94,7 @@ export default {
 		eventBus.$on('login', () => {
 			this.user = true;
 		});
+
 		eventBus.$on('logout', () => {
 			localStorage.removeItem('token');
 			localStorage.removeItem('user');
@@ -107,8 +110,9 @@ export default {
 	},
 	computed: {
 		checkAdmin() {
-			return (JSON.parse(localStorage.getItem('user_profile'))
-				.role).includes('ROLE_ADMIN');
+			return JSON.parse(localStorage.getItem('user_profile'))
+					?.role
+					.includes('ROLE_ADMIN');
 		},
 	},
 };

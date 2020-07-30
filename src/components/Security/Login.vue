@@ -66,7 +66,9 @@ export default {
 
 			eventBus.$emit('login');
 
-			return this.$router.push('/');
+			window.location.href = '/';
+
+			return true;
 		},
 	},
 };
