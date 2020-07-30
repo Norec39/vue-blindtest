@@ -29,7 +29,7 @@ export default {
 		async fetchRooms() {
 			console.log('fetch');
 			const [err, response] = await to(this.axios.get(
-				`${this.$serverApiLink}/rooms/`,
+				`${this.$serverApiLink}/games/`,
 			));
 
 			if (err) {
