@@ -3,7 +3,7 @@
 		<button class="btn btn-light" @click="fetchRooms">
 			<i class="fas fa-sync-alt"></i>
 		</button>
-		<div v-if="rooms.length" class="d-flex flex-row justify-content-around flex-wrap">
+		<div v-if="rooms.length" class="d-flex flex-row justify-content-around flex-wrap mt-4">
 			<div v-for="r in rooms" :key="r['@id']">
 				<div v-if="r.active" class="card mb-2">
 					<div class="card-header">

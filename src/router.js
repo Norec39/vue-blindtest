@@ -10,6 +10,7 @@ import RoomList from './components/Room/RoomList.vue';
 import RoomCreate from './components/Room/RoomCreate.vue';
 import RoomView from './components/Room/RoomView.vue';
 import CategoriesList from './components/Categories/CategoriesList.vue';
+import End from './components/End.vue';
 
 Vue.use(VueRouter);
 
@@ -58,6 +59,11 @@ const routes = [
 		path: '/categories',
 		name: 'categoriesList',
 		component: CategoriesList,
+	},
+	{
+		path: '/end',
+		name: 'theEnd',
+		component: End,
 	},
 ];
 
