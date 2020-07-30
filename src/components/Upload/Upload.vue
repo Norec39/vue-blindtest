@@ -16,6 +16,7 @@
 					</div>
 
 					<div v-if="!categories">
+						<i class="fas fa-spinner fa-spin"></i>
 						Loading...
 					</div>
 					<div class="form-group">
@@ -45,11 +46,12 @@
 							        type="text"
 							        name="title"
 							        :disabled="category == null">
-								<option v-for="option in sources"
-								        v-bind:value="option"
-								        v-bind:key="option.id"
+								<option :value="null" selected>(Choose a game from the list...)</option>
+								<option v-for="source in sources"
+								        v-bind:value="source"
+								        v-bind:key="source.id"
 								>
-									{{ option.name }}
+									{{ source.name }}
 								</option>
 							</select>
 						</div>
@@ -90,6 +92,36 @@
 							</label>
 						</div>
 
+						<div class="form-group"
+						     v-if="file"
+						>
+							<label for="startTime">Start Time</label>
+							<input
+									id="startTime"
+									v-model="startTime"
+									type="number"
+									name="startTime"
+									class="form-control"
+									min="0"
+									value="0"
+							>
+						</div>
+
+						<div class="form-group"
+						     v-if="file"
+						>
+							<label for="audioLength">Length</label>
+							<input
+									id="audioLength"
+									v-model="audioLength"
+									type="number"
+									name="audioLength"
+									class="form-control"
+									min="15"
+									value="30"
+							>
+						</div>
+
 						<button type="submit" class="btn btn-primary">Submit</button>
 
 					</div>
@@ -101,6 +133,8 @@
 
 <script>
 import to from '../../utils/to';
+import notify from '../../utils/notify';
+import eventBus from '../../utils/eventBus';
 
 export default {
 	name: 'Upload',
@@ -113,62 +147,79 @@ export default {
 		newSource: null,
 		title: null,
 		file: null,
+		startTime: 0,
+		audioLength: 30,
 	}),
 	beforeMount() {
 		this.getCategories();
 	},
 	methods: {
 		async getCategories() {
-			const [err, response] = await to(this.axios.get(`${this.$serverApiLink}/categories`));
+			const [err, response] = await to(this.$http.get('/categories'));
 			if (err) {
 				console.error(err);
+				return notify('Error !', 'Can\'t retrieve categories', 'error');
 			}
-			this.categories = response.data['hydra:member'];
+
+			this.categories = response.data;
+			return true;
 		},
 		async checkForm() {
 			const formData = new FormData();
+			formData.set('startTime', this.startTime);
+			formData.set('audioLength', this.audioLength);
 			formData.append('file', this.file);
 			// eslint-disable-next-line no-unused-vars
-			let [err, response] = await to(this.axios.post(`${this.$serverApiLink}/media_objects`, formData, {
+			let [err, response] = await to(this.$http.post('media_objects', formData, {
 				headers: {
+					Accept: 'application/ld+json',
 					'Content-Type': 'multipart/form-data',
 				},
 			}));
 
 			if (err) {
-				console.log('Error file upload');
 				console.error(err);
-				return false;
+				return notify('Error !', 'There was a problem uploading the audio file.', 'error');
 			}
-			const mediaSrc = response.data.contentUrl;
+			console.log(response.data);
+			const mediaSrcId = response.data['@id'];
 
 			// Create new Source
 			if (this.source == null) {
-				[err, response] = await to(this.axios.post(`${this.$serverApiLink}/sources`, {
+				[err, response] = await to(this.$http.post('sources', {
 					name: this.newSource,
-					Category: this.category,
+					category: `/api/categories/${this.category.id}`,
 				}));
 
 				if (err) {
 					console.error(err);
-					return false;
+					return notify(
+						'Error !',
+						`There was a problem creating the new ${this.getSourceType()}`,
+						'error',
+					);
 				}
 				this.source = response.data;
 			}
 
 			// eslint-disable-next-line no-unused-vars
-			[err, response] = await to(this.axios.post(`${this.$serverApiLink}/songs`, {
+			[err, response] = await to(this.$http.post('songs', {
 				title: this.title,
-				source: this.source,
-				src: mediaSrc,
+				source: `/api/sources/${this.source.id}`,
+				src: mediaSrcId,
 			}));
 
 			if (err) {
 				console.error(err);
-				return false;
+				return notify(
+					'Error !',
+					'There was a problem uploading the audio file.',
+					'error',
+				);
 			}
-			console.log('Envoi reussi');
-			return true;
+
+			eventBus.$emit('successfulUpdate');
+			return this.$router.push('/');
 		},
 		onCategoryChange() {
 			this.sources = this.category.sources;

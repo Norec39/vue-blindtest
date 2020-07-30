@@ -48,6 +48,7 @@
 
 <script>
 import eventBus from '../utils/eventBus';
+import notify from '../utils/notify';
 
 export default {
 	name: 'Navbar',
@@ -63,6 +64,11 @@ export default {
 			localStorage.removeItem('token');
 			localStorage.removeItem('user');
 		});
+		eventBus.$on('successfulUpdate', () => notify(
+			'Success !',
+			'You have successfully uploaded the song!',
+			'success',
+		));
 	},
 	methods: {
 		logout() {
