@@ -63,6 +63,8 @@
 
 <script>
 import profile from '../../utils/profile';
+import to from '../../utils/to';
+import notify from '../../utils/notify';
 
 export default {
 	name: 'RoomCreate',
@@ -74,40 +76,24 @@ export default {
 		answerNb: 0,
 	}),
 	methods: {
-		async onSubmit(e) {
-			const postData = JSON.stringify({
-				owner: `/api/users/${profile.id}`,
+		async onSubmit() {
+			const [err, response] = await to(this.axios.post(`${this.$serverApiLink}/games`, {
 				name: this.name,
 				active: true,
 				password: this.password,
 				sizeLimit: Number(this.sizeLimit),
 				scoreLimit: Number(this.scoreLimit),
-				answerNb: this.answerNb,
-			});
+				answerNb: Number(this.answerNb),
+				owner: `/api/users/${profile.id}`,
+			}));
 
-			const param = {
-				method: 'POST',
-				body: postData,
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			};
+			if (err) {
+				return notify('Error !', 'Room cannot be created', 'error');
+			}
 
-			fetch('http://localhost:8001/api/games', param)
-				.then((data) => {
-					console.log(`Ils sont partiiiiiss !!!!${data}`);
-				})
-				.catch((error) => console.log(error));
+			notify('Success !', 'Room created', 'success');
 
-			e.preventDefault();
-
-			// if (err) {
-			// 	return notify('Error !', 'Room cannot be created', 'error');
-			// }
-			//
-			// notify('Success !', 'Room created', 'success');
-			//
-			// return this.$router.push(`/room/${response.data.id}`);
+			return this.$router.push(`/room/${response.data.id}`);
 		},
 		scoreLimitMax() {
 			if (this.scoreLimit > 300) {

@@ -13,14 +13,27 @@ import VueSweetalert2 from 'vue-sweetalert2';
 
 import router from './router';
 import App from './App.vue';
+import eventBus from './utils/eventBus';
 
 Vue.prototype.$http = axios;
-Vue.prototype.$serverApiLink = 'http://localhost:8001/api';
+Vue.prototype.$serverApiLink = 'http://localhost:8000/api';
 
 Vue.use(VueSweetalert2);
 Vue.use(VueAxios, axios);
 Vue.use(Moment);
 Vue.config.productionTip = false;
+
+axios.interceptors.response.use(
+	(response) => response, (error) => {
+		// eslint-disable-next-line eqeqeq
+		if (error.response.data.message === 'Expired JWT Token') {
+			Promise.reject(error);
+			eventBus.$emit('logout');
+			return router.push('/login');
+		}
+		return Promise.reject(error);
+	},
+);
 
 axios.interceptors.request.use(
 	(config) => {

@@ -84,6 +84,8 @@ export default {
 			localStorage.removeItem('token');
 			localStorage.removeItem('user');
 			localStorage.removeItem('user_profile');
+			this.user = false;
+			this.$router.push('/login');
 		});
 	},
 	methods: {
