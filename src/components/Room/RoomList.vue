@@ -1,8 +1,14 @@
 <template>
 	<div class="container mt-3">
-		<button class="btn btn-light" @click="fetchRooms">
-			<i class="fas fa-sync-alt"></i>
-		</button>
+		<div class="d-flex justify-content-between">
+			<button class="btn btn-light" @click="fetchRooms">
+				<i class="fas fa-sync-alt"></i>
+			</button>
+			<router-link class="btn btn-success" :to="{ name: 'roomCreate' }">
+				<i class="fas fa-plus"></i>
+			</router-link>
+		</div>
+
 		<div v-if="rooms.length" class="d-flex flex-row justify-content-around flex-wrap mt-4">
 			<div v-for="r in rooms" :key="r['@id']">
 				<div v-if="r.active" class="card mb-2">
