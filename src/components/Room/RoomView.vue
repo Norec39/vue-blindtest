@@ -82,6 +82,7 @@ export default {
 				return notify('Error !', 'Can\'t find anz sources', 'error');
 			}
 			this.sources = response.data;
+			this.sources = this.sources.sort((a, b) => a.name > b.name);
 			return true;
 		},
 		async fetchSongs() {
@@ -131,22 +132,30 @@ export default {
 			return true;
 		},
 		setSourceList() {
-			this.sourceList = [];
+			this.sourceList = this.sources;
+			/*
 			let rng = 0;
-			let length = this.sources?.length;
+			let length = 0;
 			let sourceDrawer = this.sources; // eslint-disable-line
-			if (this.room.answerNb <= this.sources?.length) {
+			const songSource = this.sources.find((source) => source.id === this.getIriID(this.song.source));
+			this.sourceList.push(songSource);
+			sourceDrawer.splice(
+				this.sources.findIndex((source) => source.id === this.getIriID(this.song.source)),
+				1,
+			);
+			console.log(this.sourceList, sourceDrawer);
+			if (this.room.answerNb >= this.sources.length) {
 				this.sourceList = this.sources;
 			} else {
 				// eslint-disable-next-line no-plusplus
-				for (let i = 0; i < this.room.answerNb; i++) {
+				for (let i = 1; i < this.room.answerNb; i++) {
 					length = sourceDrawer?.length;
 					rng = Math.floor(Math.random() * length);
 					this.sourceList.push(sourceDrawer[rng]);
 					sourceDrawer.splice(rng, 1);
 					console.log(this.sourceList, sourceDrawer);
 				}
-			}
+			} */
 			this.sourceList.sort((a, b) => a.name > b.name);
 			return true;
 		},
