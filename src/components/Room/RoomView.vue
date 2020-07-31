@@ -1,131 +1,36 @@
 <template>
-	<div class="card">
-		<div class="card-header">
-			Upload music
+	<div class="container mt-3">
+		<h1>{{ room.name }}</h1>
+		<div v-if="!gameStarted">
+			<div v-if="!songList">Loading...</div>
+			<button @click="startGame" v-else>Start Game</button>
 		</div>
-		<div class="card-body">
-			<div class="card-text">
-				<form
-						id="uploadAudio"
-						@submit.prevent="checkForm">
-					<div v-if="errors.length">
-						<b>Please correct the following error(s):</b>
-						<ul>
-							<li v-for="error in errors" :key="error">{{ error }}</li>
-						</ul>
-					</div>
+		<!-- Main Gameplay div-->
+		<div v-else>
+			<h3>Current score : {{ score }}</h3>
+			<h3>Songs played : {{ songsPlayed }}</h3>
+			<audio controls loop v-if="audioSrc" id="audioPlayer">
+				<source :src="audioSrc" type="audio/mpeg">
+			</audio>
 
-					<div v-if="!categories">
-						<i class="fas fa-spinner fa-spin"></i>
-						Loading...
-					</div>
-					<div class="form-group">
-						<label for="category">Category</label>
-						<select class="form-control"
-						        id="category"
-						        v-model="category"
-						        name="category"
-						        @change="onCategoryChange()"
-						        :disabled="!categories"
-						>
-							<option v-for="category in categories"
-							        v-bind:value="category"
-							        v-bind:key="category.id"
-							>
-								{{ category.name }}
-							</option>
-						</select>
-					</div>
-
-					<div v-if="category !== null">
-						<div class="form-group" v-if="sources.length !== 0">
-							<label for="source">{{ getSourceType() }}</label>
-							<select class="form-control"
-							        id="source"
-							        v-model="source"
-							        type="text"
-							        name="title"
-							        :disabled="category == null">
-								<option :value="null" selected>(Choose a game from the list...)</option>
-								<option v-for="source in sources"
-								        v-bind:value="source"
-								        v-bind:key="source.id"
-								>
-									{{ source.name }}
-								</option>
-							</select>
-						</div>
-
-						<div class="form-group"
-						     v-if="!source"
-						>
-							<label for="newSource">New {{ getSourceType() }}?</label>
-							<input
-									id="newSource"
-									v-model="newSource"
-									type="text"
-									name="newSource"
-									class="form-control"
-							>
-						</div>
-
-						<div class="form-group">
-							<label for="title">Track Title</label>
-							<input
-									id="title"
-									v-model="title"
-									type="text"
-									name="title"
-									class="form-control"
-							>
-						</div>
-
-						<div class="form-group">
-							<label>File
-								<input type="file"
-								       id="file"
-								       class="form-control-file"
-								       accept=".mp3,audio/*"
-								       ref="file"
-								       v-on:change="handleFileUpload()"
-								/>
-							</label>
-						</div>
-
-						<div class="form-group"
-						     v-if="file"
-						>
-							<label for="startTime">Start Time</label>
-							<input
-									id="startTime"
-									v-model="startTime"
-									type="number"
-									name="startTime"
-									class="form-control"
-									min="0"
-									value="0"
-							>
-						</div>
-
-						<div class="form-group"
-						     v-if="file"
-						>
-							<label for="audioLength">Length</label>
-							<input
-									id="audioLength"
-									v-model="audioLength"
-									type="number"
-									name="audioLength"
-									class="form-control"
-									min="15"
-									value="30"
-							>
-						</div>
-
-						<button type="submit" class="btn btn-primary">Submit</button>
-
-					</div>
-				</form>
+			<div v-if="!haveAnswered && canPlayAudio">
+				<div v-for="source in sourceList"
+				     v-bind:key="source.id"
+				>
+					<button @click="checkAnswer(source.id)">{{ source.name }}</button>
+				</div>
+			</div>
+			<!-- Result screen -->
+			<div v-if="haveAnswered">
+				<div v-if="rightAnswer">
+					Congratulations, you found the right answer in {{ timer / 100 }} seconds!
+				</div>
+				<div v-else>
+					Owwww... this was the wrong answer... and you put {{ timer / 100 }} seconds to not find it!
+				</div>
+				The answer was :
+				<h3>{{ sources.find(source => source.id === getIriID(song.source)).name }} - {{ song.title }}</h3>
+				<button @click="newRound()">Next song!</button>
 			</div>
 		</div>
 	</div>
@@ -134,120 +39,141 @@
 <script>
 import to from '../../utils/to';
 import notify from '../../utils/notify';
-import eventBus from '../../utils/eventBus';
 
 export default {
-	name: 'Upload',
+	name: 'RoomList',
 	data: () => ({
-		errors: [],
-		categories: null,
-		category: null,
-		sources: [],
-		source: null,
-		newSource: null,
-		title: null,
-		file: null,
-		startTime: 0,
-		audioLength: 30,
+		room: null,
+		gameStarted: false,
+		score: 0,
+		songsPlayed: 0,
+		sources: null,
+		sourceList: null,
+		songList: null,
+		song: null,
+		audioSrc: null,
+		canPlayAudio: false,
+		rightAnswer: true,
+		haveAnswered: false,
+		audioPlayer: null,
+		timer: 0,
+		timerInterval: null,
 	}),
-	beforeMount() {
-		this.getCategories();
+	async created() {
+		await this.getRoomInfo();
+		await this.fetchSources();
+		await this.fetchSongs();
 	},
 	methods: {
-		async getCategories() {
-			const [err, response] = await to(this.$http.get('/categories'));
-			if (err) {
-				console.error(err);
-				return notify('Error !', 'Can\'t retrieve categories', 'error');
-			}
+		async getRoomInfo() {
+			console.log('fetch');
+			const [err, response] = await to(this.$http.get(`/games/${this.$route.params.id}`));
 
-			this.categories = response.data;
+			if (err) {
+				return notify('Error !', 'Can\'t find room', 'error');
+			}
+			this.room = response.data;
 			return true;
 		},
-		async checkForm() {
-			const formData = new FormData();
-			formData.set('startTime', this.startTime);
-			formData.set('audioLength', this.audioLength);
-			formData.append('file', this.file);
-			// eslint-disable-next-line no-unused-vars
-			let [err, response] = await to(this.$http.post('media_objects', formData, {
-				headers: {
-					Accept: 'application/ld+json',
-					'Content-Type': 'multipart/form-data',
-				},
-			}));
+		async fetchSources() {
+			const [err, response] = await to(this.$http.get('/sources'));
 
 			if (err) {
-				console.error(err);
-				return notify('Error !', 'There was a problem uploading the audio file.', 'error');
+				return notify('Error !', 'Can\'t find anz sources', 'error');
 			}
-			const mediaSrcId = response.data['@id'];
+			this.sources = response.data;
+			return true;
+		},
+		async fetchSongs() {
+			const [err, response] = await to(this.$http.get('/songs'));
 
-			// Create new Source
-			if (this.source == null) {
-				[err, response] = await to(this.$http.post('sources', {
-					name: this.newSource,
-					category: `/api/categories/${this.category.id}`,
-				}));
+			if (err) {
+				return notify('Error !', 'Can\'t find anz sources', 'error');
+			}
+			this.songList = response.data;
+			return true;
+		},
+		async startGame() {
+			this.gameStarted = true;
+			await this.getNewSong();
+			this.audioPlayer = document.getElementById('audioPlayer');
+			this.audioPlayer.volume = 0.2;
+			this.audioPlayer.oncanplay = this.onCanPlayFunction();
+			return true;
+		},
+		checkAnswer(id) {
+			this.haveAnswered = true;
+			this.timerStop();
+			if (id === this.getIriID(this.song.source)) {
+				this.score += 1;
+				this.rightAnswer = true;
+				return notify('Correct', 'Good Job.', 'success');
+			}
+			this.rightAnswer = false;
+			return notify('Wrong', 'It was the wrong answer.', 'error');
+		},
+		getIriID(str) {
+			const n = str.lastIndexOf('/');
+			// eslint-disable-next-line radix
+			return parseInt(str.substring(n + 1));
+		},
+		async getNewSong() {
+			// Get Random song
+			this.song = this.songList[Math.floor(Math.random() * this.songList.length)];
+			// eslint-disable-next-line no-unused-vars
+			const [err, response] = await to(this.$http.get(`/media_objects/${this.getIriID(this.song.src)}`));
 
-				if (err) {
-					console.error(err);
-					return notify(
-						'Error !',
-						`There was a problem creating the new ${this.getSourceType()}`,
-						'error',
-					);
+			if (err) {
+				return notify('Error !', 'Can\'t find any music', 'error');
+			}
+			this.audioSrc = `http://localhost:8000${response.data.contentUrl}`;
+			this.setSourceList();
+			return true;
+		},
+		setSourceList() {
+			this.sourceList = [];
+			let rng = 0;
+			let length = this.sources?.length;
+			let sourceDrawer = this.sources; // eslint-disable-line
+			if (this.room.answerNb <= this.sources?.length) {
+				this.sourceList = this.sources;
+			} else {
+				// eslint-disable-next-line no-plusplus
+				for (let i = 0; i < this.room.answerNb; i++) {
+					length = sourceDrawer?.length;
+					rng = Math.floor(Math.random() * length);
+					this.sourceList.push(sourceDrawer[rng]);
+					sourceDrawer.splice(rng, 1);
+					console.log(this.sourceList, sourceDrawer);
 				}
-				this.source = response.data;
 			}
-
-			// eslint-disable-next-line no-unused-vars
-			[err, response] = await to(this.$http.post('songs', {
-				title: this.title,
-				source: `/api/sources/${this.source.id}`,
-				src: mediaSrcId,
-			}));
-
-			if (err) {
-				console.error(err);
-				return notify(
-					'Error !',
-					'There was a problem uploading the audio file.',
-					'error',
-				);
-			}
-
-			eventBus.$emit('successfulUpdate');
-			return this.$router.push('/');
+			this.sourceList.sort((a, b) => a.name > b.name);
+			return true;
 		},
-		onCategoryChange() {
-			this.sources = this.category.sources;
+		timerStart() {
+			this.timerInterval = setInterval(() => {
+				this.timer += 1;
+			}, 10);
 		},
-		getSourceType() {
-			let string = '';
-			switch (this.category.id) {
-			case 1:
-				string = 'Game';
-				break;
-			case 2:
-				string = 'Anime';
-				break;
-			case 3:
-				string = 'Serie';
-				break;
-			default:
-				string = '';
-			}
-			return string;
+		timerStop() {
+			clearInterval(this.timerInterval);
 		},
-		handleFileUpload() {
-			// eslint-disable-next-line prefer-destructuring
-			this.file = this.$refs.file.files[0];
+		onCanPlayFunction() {
+			this.canPlayAudio = true;
+			this.audioPlayer.play();
+			this.timerStart();
+			this.songsPlayed += 1;
+		},
+		async newRound() {
+			this.canPlayAudio = false;
+			this.haveAnswered = false;
+			this.audioPlayer.pause();
+			await this.getNewSong();
+			this.audioPlayer.load();
+			this.audioPlayer.currentTime = 0;
+			this.timer = 0;
+			this.audioPlayer.oncanplay = this.onCanPlayFunction();
 		},
 	},
 };
 </script>
-
-<style scoped>
-
-</style>
