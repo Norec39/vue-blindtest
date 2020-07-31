@@ -1,36 +1,44 @@
 <template>
 	<div class="container mt-3">
-		<h1>{{ room.name }}</h1>
-		<div v-if="!gameStarted">
+		<h1 class="d-flex justify-content-center">Room : {{ room.name }}</h1>
+		<div class="d-flex justify-content-center mt-5" v-if="!gameStarted">
 			<div v-if="!songList">Loading...</div>
-			<button @click="startGame" v-else>Start Game</button>
+			<button class="btn btn-primary btn-lg" @click="startGame" v-else>Start Game</button>
 		</div>
 		<!-- Main Gameplay div-->
 		<div v-else>
-			<h3>Current score : {{ score }}</h3>
-			<h3>Songs played : {{ songsPlayed }}</h3>
-			<audio controls loop v-if="audioSrc" id="audioPlayer">
-				<source :src="audioSrc" type="audio/mpeg">
-			</audio>
-
+			<h3>Current score : <span class="badge badge-success">{{ score }}</span></h3>
+			<h3>Songs played : <span class="badge badge-dark">{{ songsPlayed }}</span></h3>
+			<div class="d-flex justify-content-center">
+				<audio controls loop v-if="audioSrc" id="audioPlayer">
+					<source :src="audioSrc" type="audio/mpeg">
+				</audio>
+			</div>
 			<div v-if="!haveAnswered && canPlayAudio">
-				<div v-for="source in sourceList"
-				     v-bind:key="source.id"
-				>
-					<button @click="checkAnswer(source.id)">{{ source.name }}</button>
+				<h5 class="d-flex justify-content-center mt-2">Pick an answer :</h5>
+				<div class="d-flex flex-row justify-content-around flex-wrap">
+					<div v-for="source in sourceList"
+							 v-bind:key="source.id"
+					>
+						<button class="btn btn-primary mt-2 mx-2"
+										@click="checkAnswer(source.id)">{{ source.name }}</button>
+					</div>
 				</div>
 			</div>
 			<!-- Result screen -->
-			<div v-if="haveAnswered">
+			<div class="d-flex justify-content-center flex-column mt-5" v-if="haveAnswered">
 				<div v-if="rightAnswer">
-					Congratulations, you found the right answer in {{ timer / 100 }} seconds!
+					<h4>Congratulations, you found the right answer in
+					<span class="badge badge-dark">{{ timer / 100 }} seconds</span>!</h4>
 				</div>
 				<div v-else>
-					Owwww... this was the wrong answer... and you put {{ timer / 100 }} seconds to not find it!
+					Owwww... this was the wrong answer... and you put
+					<span class="badge badge-dark">{{ timer / 100 }} seconds</span>
+					seconds to not find it!
 				</div>
-				The answer was :
+				<h4>The answer was :</h4>
 				<h3>{{ sources.find(source => source.id === getIriID(song.source)).name }} - {{ song.title }}</h3>
-				<button @click="newRound()">Next song!</button>
+				<button class="btn btn-primary" @click="newRound()">Next song!</button>
 			</div>
 		</div>
 	</div>

@@ -1,131 +1,133 @@
 <template>
-	<div class="card">
-		<div class="card-header">
-			Upload music
-		</div>
-		<div class="card-body">
-			<div class="card-text">
-				<form
-						id="uploadAudio"
-						@submit.prevent="checkForm">
-					<div v-if="errors.length">
-						<b>Please correct the following error(s):</b>
-						<ul>
-							<li v-for="error in errors" :key="error">{{ error }}</li>
-						</ul>
-					</div>
+	<div class="container mt-5">
+		<div class="card">
+			<div class="card-header">
+				Upload music
+			</div>
+			<div class="card-body">
+				<div class="card-text">
+					<form
+							id="uploadAudio"
+							@submit.prevent="checkForm">
+						<div v-if="errors.length">
+							<b>Please correct the following error(s):</b>
+							<ul>
+								<li v-for="error in errors" :key="error">{{ error }}</li>
+							</ul>
+						</div>
 
-					<div v-if="!categories">
-						<i class="fas fa-spinner fa-spin"></i>
-						Loading...
-					</div>
-					<div class="form-group">
-						<label for="category">Category</label>
-						<select class="form-control"
-						        id="category"
-						        v-model="category"
-						        name="category"
-						        @change="onCategoryChange()"
-						        :disabled="!categories"
-						>
-							<option v-for="category in categories"
-							        v-bind:value="category"
-							        v-bind:key="category.id"
-							>
-								{{ category.name }}
-							</option>
-						</select>
-					</div>
-
-					<div v-if="category !== null">
-						<div class="form-group" v-if="sources.length !== 0">
-							<label for="source">{{ getSourceType() }}</label>
+						<div v-if="!categories">
+							<i class="fas fa-spinner fa-spin"></i>
+							Loading...
+						</div>
+						<div class="form-group">
+							<label for="category">Category</label>
 							<select class="form-control"
-							        id="source"
-							        v-model="source"
-							        type="text"
-							        name="title"
-							        :disabled="category == null">
-								<option :value="null" selected>(Choose a game from the list...)</option>
-								<option v-for="source in sources"
-								        v-bind:value="source"
-								        v-bind:key="source.id"
+											id="category"
+											v-model="category"
+											name="category"
+											@change="onCategoryChange()"
+											:disabled="!categories"
+							>
+								<option v-for="category in categories"
+												v-bind:value="category"
+												v-bind:key="category.id"
 								>
-									{{ source.name }}
+									{{ category.name }}
 								</option>
 							</select>
 						</div>
 
-						<div class="form-group"
-						     v-if="!source"
-						>
-							<label for="newSource">New {{ getSourceType() }}?</label>
-							<input
-									id="newSource"
-									v-model="newSource"
-									type="text"
-									name="newSource"
-									class="form-control"
+						<div v-if="category !== null">
+							<div class="form-group" v-if="sources.length !== 0">
+								<label for="source">{{ getSourceType() }}</label>
+								<select class="form-control"
+												id="source"
+												v-model="source"
+												type="text"
+												name="title"
+												:disabled="category == null">
+									<option :value="null" selected>(Choose a game from the list...)</option>
+									<option v-for="source in sources"
+													v-bind:value="source"
+													v-bind:key="source.id"
+									>
+										{{ source.name }}
+									</option>
+								</select>
+							</div>
+
+							<div class="form-group"
+									 v-if="!source"
 							>
-						</div>
+								<label for="newSource">New {{ getSourceType() }}?</label>
+								<input
+										id="newSource"
+										v-model="newSource"
+										type="text"
+										name="newSource"
+										class="form-control"
+								>
+							</div>
 
-						<div class="form-group">
-							<label for="title">Track Title</label>
-							<input
-									id="title"
-									v-model="title"
-									type="text"
-									name="title"
-									class="form-control"
+							<div class="form-group">
+								<label for="title">Track Title</label>
+								<input
+										id="title"
+										v-model="title"
+										type="text"
+										name="title"
+										class="form-control"
+								>
+							</div>
+
+							<div class="form-group">
+								<label>File
+									<input type="file"
+												 id="file"
+												 class="form-control-file"
+												 accept=".mp3,audio/*"
+												 ref="file"
+												 v-on:change="handleFileUpload()"
+									/>
+								</label>
+							</div>
+
+							<div class="form-group"
+									 v-if="file"
 							>
-						</div>
+								<label for="startTime">Start Time</label>
+								<input
+										id="startTime"
+										v-model="startTime"
+										type="number"
+										name="startTime"
+										class="form-control"
+										min="0"
+										value="0"
+								>
+							</div>
 
-						<div class="form-group">
-							<label>File
-								<input type="file"
-								       id="file"
-								       class="form-control-file"
-								       accept=".mp3,audio/*"
-								       ref="file"
-								       v-on:change="handleFileUpload()"
-								/>
-							</label>
-						</div>
-
-						<div class="form-group"
-						     v-if="file"
-						>
-							<label for="startTime">Start Time</label>
-							<input
-									id="startTime"
-									v-model="startTime"
-									type="number"
-									name="startTime"
-									class="form-control"
-									min="0"
-									value="0"
+							<div class="form-group"
+									 v-if="file"
 							>
+								<label for="audioLength">Length</label>
+								<input
+										id="audioLength"
+										v-model="audioLength"
+										type="number"
+										name="audioLength"
+										class="form-control"
+										min="15"
+										value="30"
+								>
+							</div>
+
+							<button type="submit" class="btn btn-primary">Submit</button>
+
 						</div>
-
-						<div class="form-group"
-						     v-if="file"
-						>
-							<label for="audioLength">Length</label>
-							<input
-									id="audioLength"
-									v-model="audioLength"
-									type="number"
-									name="audioLength"
-									class="form-control"
-									min="15"
-									value="30"
-							>
-						</div>
-
-						<button type="submit" class="btn btn-primary">Submit</button>
-
-					</div>
-				</form>
+					</form>
+				</div>
 			</div>
 		</div>
 	</div>
