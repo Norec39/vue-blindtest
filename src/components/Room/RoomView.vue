@@ -2,7 +2,10 @@
 	<div class="container mt-3">
 		<h1 class="d-flex justify-content-center">Room : {{ room.name }}</h1>
 		<div class="d-flex justify-content-center mt-5" v-if="!gameStarted">
-			<div v-if="!songList">Loading...</div>
+			<div v-if="!songList" class="text-center">
+				<i class="fas fa-spin fa-3x fa-sync fa-fw text-primary"></i>
+				<p class="mt-3 lead">Loading</p>
+			</div>
 			<button class="btn btn-primary btn-lg" @click="startGame" v-else>Start Game</button>
 		</div>
 		<!-- Main Gameplay div-->
@@ -21,8 +24,14 @@
 							 v-bind:key="source.id"
 					>
 						<button class="btn btn-primary mt-2 mx-2"
-										@click="checkAnswer(source.id)">{{ source.name }}</button>
+								@click="checkAnswer(source.id)">{{ source.name }}</button>
 					</div>
+				</div>
+			</div>
+			<div v-else>
+				<div class="text-center" v-if="!haveAnswered">
+					<i class="fas fa-spin fa-3x fa-sync fa-fw text-primary"></i>
+					<p class="mt-3 lead">Loading audio</p>
 				</div>
 			</div>
 			<!-- Result screen -->
@@ -38,7 +47,13 @@
 				</div>
 				<h4>The answer was :</h4>
 				<h3>{{ sources.find(source => source.id === getIriID(song.source)).name }} - {{ song.title }}</h3>
-				<button class="btn btn-primary" @click="newRound()">Next song!</button>
+				<div v-if="score < room.scoreLimit">
+					<button class="btn btn-primary" @click="newRound()">Next song!</button>
+				</div>
+				<div v-else>
+					<h3>Game Over. Congratulations, you've reached the score limit.</h3>
+					<button class="btn btn-success" @click="endGame">Close room</button>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -51,12 +66,12 @@ import notify from '../../utils/notify';
 export default {
 	name: 'RoomList',
 	data: () => ({
-		room: null,
+		room: { name: null },
 		gameStarted: false,
 		score: 0,
 		songsPlayed: 0,
 		sources: null,
-		sourceList: null,
+		sourceList: [],
 		songList: null,
 		song: null,
 		audioSrc: null,
@@ -140,31 +155,27 @@ export default {
 			return true;
 		},
 		setSourceList() {
-			this.sourceList = this.sources;
-			/*
+			this.sourceList = [];
+			let idList = []; // eslint-disable-line
 			let rng = 0;
-			let length = 0;
-			let sourceDrawer = this.sources; // eslint-disable-line
+			let i = 1;
 			const songSource = this.sources.find((source) => source.id === this.getIriID(this.song.source));
+			idList.push(songSource.id);
 			this.sourceList.push(songSource);
-			sourceDrawer.splice(
-				this.sources.findIndex((source) => source.id === this.getIriID(this.song.source)),
-				1,
-			);
-			console.log(this.sourceList, sourceDrawer);
 			if (this.room.answerNb >= this.sources.length) {
 				this.sourceList = this.sources;
-			} else {
-				// eslint-disable-next-line no-plusplus
-				for (let i = 1; i < this.room.answerNb; i++) {
-					length = sourceDrawer?.length;
-					rng = Math.floor(Math.random() * length);
-					this.sourceList.push(sourceDrawer[rng]);
-					sourceDrawer.splice(rng, 1);
-					console.log(this.sourceList, sourceDrawer);
+				this.sourceList.sort((a, b) => a.name.localeCompare(b.name));
+				return true;
+			}
+			while (i < this.room.answerNb) {
+				rng = Math.floor(Math.random() * this.sources.length);
+				if (!idList.includes(this.sources[rng].id)) {
+					this.sourceList.push(this.sources[rng]);
+					idList.push(this.sources[rng].id);
+					i += 1;
 				}
-			} */
-			this.sourceList.sort((a, b) => a.name > b.name);
+			}
+			this.sourceList.sort((a, b) => a.name.localeCompare(b.name));
 			return true;
 		},
 		timerStart() {
@@ -189,8 +200,29 @@ export default {
 			this.audioPlayer.load();
 			this.audioPlayer.currentTime = 0;
 			this.timer = 0;
-			this.audioPlayer.oncanplay = this.onCanPlayFunction();
+			this.audioPlayer.oncanplaythrough = this.onCanPlayFunction();
 		},
+		async endGame() {
+			// eslint-disable-next-line no-unused-vars
+			const [err, response] = await to(this.$http.patch(
+				`/games/${this.room.id}`,
+				{
+					active: false,
+				},
+				{
+					headers: {
+						'Content-Type': 'application/merge-patch+json',
+					},
+				},
+			));
+			if (err) {
+				return notify('Error !', 'Can\'t close room', 'error');
+			}
+			return this.$router.push('/');
+		},
+	},
+	destroyed() {
+		delete this.audioPlayer;
 	},
 };
 </script>
