@@ -6,8 +6,8 @@
 		<div class="card-body">
 			<div class="card-text">
 				<form
-					id="uploadAudio"
-					@submit.prevent="checkForm">
+						id="uploadAudio"
+						@submit.prevent="checkForm">
 					<div v-if="errors.length">
 						<b>Please correct the following error(s):</b>
 						<ul>
@@ -61,34 +61,34 @@
 						>
 							<label for="newSource">New {{ getSourceType() }}?</label>
 							<input
-								id="newSource"
-								v-model="newSource"
-								type="text"
-								name="newSource"
-								class="form-control"
+									id="newSource"
+									v-model="newSource"
+									type="text"
+									name="newSource"
+									class="form-control"
 							>
 						</div>
 
 						<div class="form-group">
 							<label for="title">Track Title</label>
 							<input
-								id="title"
-								v-model="title"
-								type="text"
-								name="title"
-								class="form-control"
+									id="title"
+									v-model="title"
+									type="text"
+									name="title"
+									class="form-control"
 							>
 						</div>
 
 						<div class="form-group">
 							<label>File
-							<input type="file"
-							       id="file"
-							       class="form-control-file"
-							       accept=".mp3,audio/*"
-							       ref="file"
-							       v-on:change="handleFileUpload()"
-							/>
+								<input type="file"
+								       id="file"
+								       class="form-control-file"
+								       accept=".mp3,audio/*"
+								       ref="file"
+								       v-on:change="handleFileUpload()"
+								/>
 							</label>
 						</div>
 
@@ -181,7 +181,6 @@ export default {
 				console.error(err);
 				return notify('Error !', 'There was a problem uploading the audio file.', 'error');
 			}
-			console.log(response.data);
 			const mediaSrcId = response.data['@id'];
 
 			// Create new Source
@@ -244,7 +243,6 @@ export default {
 		handleFileUpload() {
 			// eslint-disable-next-line prefer-destructuring
 			this.file = this.$refs.file.files[0];
-			console.log(this.file);
 		},
 	},
 };

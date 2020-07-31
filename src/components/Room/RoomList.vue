@@ -21,8 +21,8 @@
 							</button>
 						</div>
 						<router-link v-else
-												 class="btn btn-success"
-												 :to="{ name: 'roomView', params: { id: r.id } }">
+						             class="btn btn-success"
+						             :to="{ name: 'roomView', params: { id: r.id } }">
 							Entrer dans la room
 						</router-link>
 					</div>
@@ -50,9 +50,7 @@ export default {
 	methods: {
 		async fetchRooms() {
 			console.log('fetch');
-			const [err, response] = await to(this.axios.get(
-				`${this.$serverApiLink}/games/`,
-			));
+			const [err, response] = await to(this.$http.get('/games'));
 
 			if (err) {
 				return notify('Error !', 'Can\'t find rooms', 'error');

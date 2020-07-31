@@ -8,16 +8,16 @@
 				<form @submit.prevent="onSubmit">
 					<div class="form-group">
 						<input v-model='name'
-									 type="text"
-									 class="form-control"
-									 placeholder="Enter the name of the room"
-									 required>
+						       type="text"
+						       class="form-control"
+						       placeholder="Enter the name of the room"
+						       required>
 					</div>
 					<div class="form-group">
 						<input v-model='password'
-									 type="password"
-									 class="form-control"
-									 placeholder="Enter the password of the room"
+						       type="password"
+						       class="form-control"
+						       placeholder="Enter the password of the room"
 						>
 						<small id="passwordHelp" class="form-text text-white">
 							Password is optional
@@ -25,22 +25,22 @@
 					</div>
 					<div class="form-group">
 						<input v-model='sizeLimit'
-									 type="number"
-									 class="form-control"
-									 placeholder="Enter the limit of player in the room"
-									 max="100"
-									 @input="sizeLimitMax"
-									 required
+						       type="number"
+						       class="form-control"
+						       placeholder="Enter the limit of player in the room"
+						       max="100"
+						       @input="sizeLimitMax"
+						       required
 						>
 					</div>
 					<div class="form-group">
 						<input v-model='scoreLimit'
-									 type="number"
-									 class="form-control"
-									 placeholder="Enter the score limit to win"
-									 max="300"
-									 @input="scoreLimitMax"
-									 required
+						       type="number"
+						       class="form-control"
+						       placeholder="Enter the score limit to win"
+						       max="300"
+						       @input="scoreLimitMax"
+						       required
 						>
 					</div>
 					<div class="form-group">
@@ -77,7 +77,7 @@ export default {
 	}),
 	methods: {
 		async onSubmit() {
-			const [err, response] = await to(this.axios.post(`${this.$serverApiLink}/games`, {
+			const [err, response] = await to(this.$http.post('/games', {
 				name: this.name,
 				active: true,
 				password: this.password,
