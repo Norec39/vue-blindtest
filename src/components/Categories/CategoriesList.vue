@@ -73,8 +73,8 @@ export default {
 	},
 	methods: {
 		async fetchRooms() {
-			const [err, response] = await to(this.axios.get(
-				`${this.$serverApiLink}/categories/`,
+			const [err, response] = await to(this.$http.get(
+				'/categories/',
 			));
 
 			if (err) {
@@ -84,8 +84,8 @@ export default {
 			return true;
 		},
 		async removeElement(id) {
-			const [err, response] = await to(this.axios.delete(
-				`${this.$serverApiLink}/categories/${id}`,
+			const [err, response] = await to(this.$http.delete(
+				`/categories/${id}`,
 			));
 
 			if (err) {
@@ -99,8 +99,8 @@ export default {
 			return true;
 		},
 		async onSubmit() {
-			const [err, response] = await to(this.axios.post(
-				`${this.$serverApiLink}/categories`,
+			const [err, response] = await to(this.$http.post(
+				'/categories',
 				{
 					name: this.categorie,
 				},
@@ -123,8 +123,8 @@ export default {
 			this.editCategorieId = c.id;
 		},
 		async submitEditElement() {
-			const [err, response] = await to(this.axios.patch(
-				`${this.$serverApiLink}/categories/${this.editCategorieId}`,
+			const [err, response] = await to(this.$http.patch(
+				`/categories/${this.editCategorieId}`,
 				{
 					name: this.editCategorie,
 				},

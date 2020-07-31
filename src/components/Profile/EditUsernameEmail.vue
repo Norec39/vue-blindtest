@@ -53,8 +53,8 @@ export default {
 	},
 	methods: {
 		async onSubmit() {
-			const [err, response] = await to(this.axios.put(
-				`${this.$serverApiLink}/users/${profile.id}`, {
+			const [err, response] = await to(this.$http.put(
+				`/users/${profile.id}`, {
 					username: this.username === null ? this.oldUsername : this.username,
 					email: this.email === null ? this.oldEmail : this.email,
 				},
@@ -73,7 +73,7 @@ export default {
 		},
 		async renewToken() {
 			// eslint-disable-next-line no-unused-vars
-			const [err, response] = await to(this.axios.post(`${this.$serverApiLink}/login_check`, {
+			const [err, response] = await to(this.$http.post('/login_check', {
 				username: this.email === null ? this.oldEmail : this.email,
 				password: this.password,
 			}));

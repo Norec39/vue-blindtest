@@ -18,8 +18,8 @@ export default {
 	}),
 	// eslint-disable-next-line consistent-return
 	async mounted() {
-		const [err, response] = await to(this.axios.get(
-			`${this.$serverApiLink}/users/${profile.id}`,
+		const [err, response] = await to(this.$http.get(
+			`/users/${profile.id}`,
 		));
 
 		if (err) {
