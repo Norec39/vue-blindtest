@@ -52,7 +52,7 @@ export default {
 	methods: {
 		async onSubmit() {
 			// eslint-disable-next-line no-unused-vars
-			const [err, response] = await to(this.axios.post(`${this.$serverApiLink}/login_check`, {
+			const [err, response] = await to(this.$http.post('/login_check', {
 				username: this.email,
 				password: this.password,
 			}));

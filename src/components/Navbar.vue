@@ -3,11 +3,11 @@
 		<nav class="navbar navbar-expand-lg navbar-light bg-light">
 			<a class="navbar-brand" href="/">Navbar</a>
 			<button class="navbar-toggler" type="button"
-							data-toggle="collapse"
-							data-target="#navbarSupportedContent"
-							aria-controls="navbarSupportedContent"
-							aria-expanded="false"
-							aria-label="Toggle navigation">
+					data-toggle="collapse"
+					data-target="#navbarSupportedContent"
+					aria-controls="navbarSupportedContent"
+					aria-expanded="false"
+					aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"></span>
 			</button>
 			<div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -40,13 +40,13 @@
 			<ul class="navbar-nav ml-auto" v-if="!user">
 				<li class="nav-item">
 					<router-link class="nav-link"
-											 :to="{ name: 'register'}">
+								 :to="{ name: 'register'}">
 						Register
 					</router-link>
 				</li>
 				<li class="nav-item">
 					<router-link class="nav-link"
-											 :to="{ name: 'login' }">
+								 :to="{ name: 'login' }">
 						Login
 					</router-link>
 				</li>
@@ -80,6 +80,7 @@
 <script>
 import eventBus from '../utils/eventBus';
 import profile from '../utils/profile';
+import notify from '../utils/notify';
 
 export default {
 	name: 'Navbar',
@@ -94,7 +95,6 @@ export default {
 		eventBus.$on('login', () => {
 			this.user = true;
 		});
-
 		eventBus.$on('logout', () => {
 			localStorage.removeItem('token');
 			localStorage.removeItem('user');
@@ -102,6 +102,11 @@ export default {
 			this.user = false;
 			this.$router.push('/login');
 		});
+		eventBus.$on('successfulUpdate', () => notify(
+			'Success !',
+			'You have successfully uploaded the song!',
+			'success',
+		));
 	},
 	methods: {
 		logout() {

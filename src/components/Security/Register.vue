@@ -88,7 +88,7 @@ export default {
 		},
 		async onSubmit() {
 			// eslint-disable-next-line no-unused-vars
-			const [err, response] = await to(this.axios.post(`${this.$serverApiLink}/register`, {
+			const [err, response] = await to(this.$http.post('register', {
 				username: this.username,
 				password: this.password,
 				email: this.email,

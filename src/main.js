@@ -8,22 +8,23 @@ import '@fortawesome/fontawesome-free/css/all.css';
 import Vue from 'vue';
 import Moment from 'vue-moment';
 import axios from 'axios';
-import VueAxios from 'vue-axios';
 import VueSweetalert2 from 'vue-sweetalert2';
 
 import router from './router';
 import App from './App.vue';
 import eventBus from './utils/eventBus';
 
-Vue.prototype.$http = axios;
-Vue.prototype.$serverApiLink = 'http://localhost:8000/api';
+Vue.prototype.$http = axios.create({
+	baseURL: 'http://localhost:8000/api',
+	headers: {
+		Accept: 'application/json',
+	},
+});
 
 Vue.use(VueSweetalert2);
-Vue.use(VueAxios, axios);
 Vue.use(Moment);
 Vue.config.productionTip = false;
-
-axios.interceptors.response.use(
+Vue.prototype.$http.interceptors.request.use(
 	(response) => response, (error) => {
 		// eslint-disable-next-line eqeqeq
 		if (error.response.data.message === 'Invalid JWT Token') {
@@ -35,15 +36,13 @@ axios.interceptors.response.use(
 	},
 );
 
-axios.interceptors.request.use(
+Vue.prototype.$http.interceptors.request.use(
 	(config) => {
 		const token = localStorage.getItem('token');
 		if (token) {
 			// eslint-disable-next-line no-param-reassign
 			config.headers.Authorization = `Bearer ${token}`;
 		}
-		// eslint-disable-next-line no-param-reassign
-		config.headers.Accept = 'application/json';
 		return config;
 	},
 	(error) => {
