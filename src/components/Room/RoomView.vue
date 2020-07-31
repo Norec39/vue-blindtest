@@ -13,9 +13,20 @@
 			<h3>Current score : <span class="badge badge-success">{{ score }}</span></h3>
 			<h3>Songs played : <span class="badge badge-dark">{{ songsPlayed }}</span></h3>
 			<div class="d-flex justify-content-center">
-				<audio controls loop v-if="audioSrc" id="audioPlayer">
-					<source :src="audioSrc" type="audio/mpeg">
-				</audio>
+<!--				<audio controls loop v-if="audioSrc" id="audioPlayer">-->
+<!--					<source :src="audioSrc" type="audio/mpeg">-->
+<!--				</audio>-->
+				<div class="btn-group mb-3">
+					<button class="btn btn-warning" @click="volumeMute">
+						<i class="fas fa-volume-mute"></i>
+					</button>
+					<button class="btn btn-primary" @click="volumeDown">
+						<i class="fas fa-volume-down"></i>
+					</button>
+					<button class="btn btn-primary" @click="volumeUp">
+						<i class="fas fa-volume-up"></i>
+					</button>
+				</div>
 			</div>
 			<div v-if="!haveAnswered && canPlayAudio">
 				<h5 class="d-flex justify-content-center mt-2">Pick an answer :</h5>
@@ -102,7 +113,7 @@ export default {
 			const [err, response] = await to(this.$http.get('/sources'));
 
 			if (err) {
-				return notify('Error !', 'Can\'t find anz sources', 'error');
+				return notify('Error !', 'Can\'t find any sources', 'error');
 			}
 			this.sources = response.data;
 			this.sources = this.sources.sort((a, b) => a.name > b.name);
@@ -112,7 +123,7 @@ export default {
 			const [err, response] = await to(this.$http.get('/songs'));
 
 			if (err) {
-				return notify('Error !', 'Can\'t find anz sources', 'error');
+				return notify('Error !', 'Can\'t find any sources', 'error');
 			}
 			this.songList = response.data;
 			return true;
@@ -120,7 +131,8 @@ export default {
 		async startGame() {
 			this.gameStarted = true;
 			await this.getNewSong();
-			this.audioPlayer = document.getElementById('audioPlayer');
+			this.audioPlayer = new Audio(this.audioSrc);
+			this.audioPlayer.loop = true;
 			this.audioPlayer.volume = 0.2;
 			this.audioPlayer.oncanplay = this.onCanPlayFunction();
 			return true;
@@ -193,12 +205,13 @@ export default {
 			this.songsPlayed += 1;
 		},
 		async newRound() {
+			const vol = this.audioPlayer.volume;
 			this.canPlayAudio = false;
 			this.haveAnswered = false;
 			this.audioPlayer.pause();
 			await this.getNewSong();
-			this.audioPlayer.load();
-			this.audioPlayer.currentTime = 0;
+			this.audioPlayer = new Audio(this.audioSrc);
+			this.audioPlayer.volume = vol;
 			this.timer = 0;
 			this.audioPlayer.oncanplaythrough = this.onCanPlayFunction();
 		},
@@ -220,8 +233,20 @@ export default {
 			}
 			return this.$router.push('/');
 		},
+		volumeUp() {
+			const vol = this.audioPlayer.volume;
+			this.audioPlayer.volume = vol + 0.1 > 1 ? 1 : vol + 0.1;
+		},
+		volumeDown() {
+			const vol = this.audioPlayer.volume;
+			this.audioPlayer.volume = vol - 0.1 < 0 ? 0 : vol - 0.1;
+		},
+		volumeMute() {
+			this.audioPlayer.volume = 0;
+		},
 	},
 	destroyed() {
+		this.audioPlayer.pause();
 		delete this.audioPlayer;
 	},
 };
